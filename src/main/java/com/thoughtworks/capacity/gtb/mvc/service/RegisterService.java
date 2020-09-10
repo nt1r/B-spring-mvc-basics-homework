@@ -2,7 +2,7 @@ package com.thoughtworks.capacity.gtb.mvc.service;
 
 import com.thoughtworks.capacity.gtb.mvc.dto.RegisterRequestDto;
 import com.thoughtworks.capacity.gtb.mvc.entity.User;
-import com.thoughtworks.capacity.gtb.mvc.exception.RegisterError;
+import com.thoughtworks.capacity.gtb.mvc.exception.RegisterUsernameDuplicatedError;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -15,7 +15,7 @@ public class RegisterService {
 
     public void register(RegisterRequestDto registerRequestDto) {
         if (checkUsernameDuplicated(registerRequestDto)) {
-            throw new RegisterError("用户已存在");
+            throw new RegisterUsernameDuplicatedError("用户已存在");
         }
 
         User user = User.builder()

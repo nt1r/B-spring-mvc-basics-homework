@@ -15,9 +15,9 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @Builder
 public class RegisterRequestDto {
-    @NotNull
-    @Size(min = 3, max = 10)
-    @Pattern(regexp = "^[0-9a-zA-Z_]+$")
+    @NotNull(message = "用户名不能为空")
+    @Size(min = 3, max = 10, message = "用户名长度应为3到10位")
+    @Pattern(regexp = "^[0-9a-zA-Z_]+$", message = "用户名只能由字母、数字或下划线组成")
     String username;
 
     @NotNull

@@ -94,4 +94,72 @@ class RegisterControllerTest {
 
         assertEquals(1, RegisterService.userMap.size());
     }
+
+    @Test
+    public void shouldRegisterFailedWhenUsernameIsNull() throws Exception {
+        RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
+                .password("123456")
+                .email("tom@qq.com")
+                .build();
+
+        mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequestDto)))
+                .andExpect(jsonPath("$.message", is("用户名不能为空")))
+                .andExpect(status().isBadRequest());
+
+        assertEquals(0, RegisterService.userMap.size());
+    }
+
+    @Test
+    public void shouldRegisterFailedWhenUsernameSizeInvalid() throws Exception {
+        RegisterRequestDto shortUsernameRequest = RegisterRequestDto.builder()
+                .username("lq")
+                .password("123456")
+                .email("lq@qq.com")
+                .build();
+
+        mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(shortUsernameRequest)))
+                .andExpect(jsonPath("$.message", is("用户名长度应为3到10位")))
+                .andExpect(status().isBadRequest());
+
+        assertEquals(0, RegisterService.userMap.size());
+
+        RegisterRequestDto longUsernameRequest = RegisterRequestDto.builder()
+                .username("lqqqqqqqqqqqqqqq")
+                .password("123456")
+                .email("lqqqqqqqqqqqqqqq@qq.com")
+                .build();
+
+        mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(longUsernameRequest)))
+                .andExpect(jsonPath("$.message", is("用户名长度应为3到10位")))
+                .andExpect(status().isBadRequest());
+
+        assertEquals(0, RegisterService.userMap.size());
+    }
+
+    @Test
+    public void shouldRegisterFailedWhenUsernameContainsInvalidCharacters() throws Exception {
+        RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
+                .username("@le#qi$")
+                .password("123456")
+                .email("leqi@qq.com")
+                .build();
+
+        mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequestDto)))
+                .andExpect(jsonPath("$.message", is("用户名只能由字母、数字或下划线组成")))
+                .andExpect(status().isBadRequest());
+
+        assertEquals(0, RegisterService.userMap.size());
+    }
 }
