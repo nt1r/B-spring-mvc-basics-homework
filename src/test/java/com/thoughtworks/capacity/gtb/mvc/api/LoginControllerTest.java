@@ -53,4 +53,60 @@ class LoginControllerTest {
                 .characterEncoding("UTF-8"))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    public void shouldLoginFailedWhenUsernameIsNull() throws Exception {
+        mockMvc.perform(get(String.format(loginUrl, "", "123456"))
+                .accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldLoginFailedWhenUsernameTooLong() throws Exception {
+        mockMvc.perform(get(String.format(loginUrl, "leqqqqqqqqqqqqqqq", "123456"))
+                .accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldLoginFailedWhenUsernameTooShort() throws Exception {
+        mockMvc.perform(get(String.format(loginUrl, "lq", "123456"))
+                .accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldLoginFailedWhenUsernameContainsInvalidCharacters() throws Exception {
+        mockMvc.perform(get(String.format(loginUrl, "@le#qi$", "123456"))
+                .accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldLoginFailedWhenPasswordIsNull() throws Exception {
+        mockMvc.perform(get(String.format(loginUrl, "Tom", ""))
+                .accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldLoginFailedWhenPasswordTooShort() throws Exception {
+        mockMvc.perform(get(String.format(loginUrl, "Tom", "123"))
+                .accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldLoginFailedWhenPasswordTooLong() throws Exception {
+        mockMvc.perform(get(String.format(loginUrl, "Tom", "123456789101112"))
+                .accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8"))
+                .andExpect(status().isBadRequest());
+    }
 }

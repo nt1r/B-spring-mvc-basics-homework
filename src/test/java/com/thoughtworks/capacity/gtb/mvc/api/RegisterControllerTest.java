@@ -150,7 +150,7 @@ class RegisterControllerTest {
     }
 
     @Test
-    public void shouldRegisterFailedWhenUsernameSizeInvalid() throws Exception {
+    public void shouldRegisterFailedWhenUsernameTooShort() throws Exception {
         mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -159,7 +159,10 @@ class RegisterControllerTest {
                 .andExpect(status().isBadRequest());
 
         assertEquals(0, UserService.userMap.size());
+    }
 
+    @Test
+    public void shouldRegisterFailedWhenUsernameTooLong() throws Exception {
         mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -207,7 +210,7 @@ class RegisterControllerTest {
     }
 
     @Test
-    public void shouldRegisterFailedWhenPasswordSizeInvalid() throws Exception {
+    public void shouldRegisterFailedWhenPasswordTooShort() throws Exception {
         mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -216,7 +219,10 @@ class RegisterControllerTest {
                 .andExpect(status().isBadRequest());
 
         assertEquals(0, UserService.userMap.size());
+    }
 
+    @Test
+    public void shouldRegisterFailedWhenPasswordTooLong() throws Exception {
         mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
                 .contentType(MediaType.APPLICATION_JSON)
