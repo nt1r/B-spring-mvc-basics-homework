@@ -198,18 +198,6 @@ class RegisterControllerTest {
     }
 
     @Test
-    public void shouldRegisterFailedWhenPasswordIsEmpty() throws Exception {
-        mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(emptyPasswordRequest)))
-                .andExpect(jsonPath("$.message", is("密码长度应为5到12位")))
-                .andExpect(status().isBadRequest());
-
-        assertEquals(0, UserService.userMap.size());
-    }
-
-    @Test
     public void shouldRegisterFailedWhenPasswordTooShort() throws Exception {
         mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")

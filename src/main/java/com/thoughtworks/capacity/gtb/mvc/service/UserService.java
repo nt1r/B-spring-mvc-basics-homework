@@ -3,6 +3,7 @@ package com.thoughtworks.capacity.gtb.mvc.service;
 import com.thoughtworks.capacity.gtb.mvc.dto.LoginResponseDto;
 import com.thoughtworks.capacity.gtb.mvc.dto.RegisterRequestDto;
 import com.thoughtworks.capacity.gtb.mvc.entity.User;
+import com.thoughtworks.capacity.gtb.mvc.exception.PasswordNotCorrectException;
 import com.thoughtworks.capacity.gtb.mvc.exception.RegisterUsernameDuplicatedError;
 import com.thoughtworks.capacity.gtb.mvc.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
@@ -46,6 +47,9 @@ public class UserService {
         if (user == null) {
             throw new UserNotFoundException("用户不存在");
         }
+        if (isPasswordIncorrect(user, password)) {
+            throw new PasswordNotCorrectException("登录密码错误");
+        }
 
         return LoginResponseDto.builder()
                 .id(user.getId())
@@ -53,6 +57,10 @@ public class UserService {
                 .password(user.getPassword())
                 .email(user.getEmail())
                 .build();
+    }
+
+    private boolean isPasswordIncorrect(User user, String password) {
+        return !user.getPassword().equals(password);
     }
 
     private User findUserByUsername(String username) {

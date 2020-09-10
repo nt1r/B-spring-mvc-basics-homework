@@ -37,8 +37,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleLoginUserNotExistError(UserNotFoundException exception) {
+    @ExceptionHandler({UserNotFoundException.class, PasswordNotCorrectException.class})
+    public ResponseEntity<ErrorResponse> handleLoginUserNotExistError(Exception exception) {
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .code(HttpStatus.BAD_REQUEST.value())
                 .message(exception.getMessage())

@@ -117,4 +117,12 @@ class LoginControllerTest {
                 .characterEncoding("UTF-8"))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    public void shouldLoginFailedWhenPasswordIncorrect() throws Exception {
+        mockMvc.perform(get(String.format(loginUrl, "Tom", "654321"))
+                .accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8"))
+                .andExpect(status().isBadRequest());
+    }
 }
