@@ -15,9 +15,15 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @Builder
 public class RegisterRequestDto {
+    @NotNull
+    @Size(min = 3, max = 10)
+    @Pattern(regexp = "^[0-9a-zA-Z_]+$")
     String username;
 
+    @NotNull
+    @Size(min = 5, max = 12)
     String password;
 
+    @Email
     String email;
 }

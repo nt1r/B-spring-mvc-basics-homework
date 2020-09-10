@@ -14,6 +14,10 @@ public class RegisterService {
     public static final Map<Integer, User> userMap = new HashMap<>();
 
     public void register(RegisterRequestDto registerRequestDto) {
+        if (checkUsernameDuplicated(registerRequestDto)) {
+            throw new RegisterError("用户已存在");
+        }
+
         User user = User.builder()
                 .id(autoIncreaseId)
                 .username(registerRequestDto.getUsername())
@@ -21,5 +25,17 @@ public class RegisterService {
                 .email(registerRequestDto.getEmail())
                 .build();
         userMap.put(autoIncreaseId++, user);
+    }
+
+    private boolean checkUsernameDuplicated(RegisterRequestDto registerRequestDto) {
+        boolean duplicated = false;
+        for (int id: userMap.keySet()) {
+            User user = userMap.get(id);
+            if (user.getUsername().equals(registerRequestDto.getUsername())) {
+                duplicated = true;
+                break;
+            }
+        }
+        return duplicated;
     }
 }
