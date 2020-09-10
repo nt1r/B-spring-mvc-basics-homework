@@ -1,6 +1,5 @@
 package com.thoughtworks.capacity.gtb.mvc.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.capacity.gtb.mvc.dto.RegisterRequestDto;
 import com.thoughtworks.capacity.gtb.mvc.service.RegisterService;
@@ -28,6 +27,61 @@ class RegisterControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    RegisterRequestDto normalRequest = RegisterRequestDto.builder()
+            .username("Tom")
+            .password("123456")
+            .email("tom@qq.com")
+            .build();
+    RegisterRequestDto withoutUsernameRequest = RegisterRequestDto.builder()
+            .password("123456")
+            .email("tom@qq.com")
+            .build();
+    RegisterRequestDto emptyUsernameRequest = RegisterRequestDto.builder()
+            .username("")
+            .password("123456")
+            .email("tom@qq.com")
+            .build();
+    RegisterRequestDto shortUsernameRequest = RegisterRequestDto.builder()
+            .username("lq")
+            .password("123456")
+            .email("lq@qq.com")
+            .build();
+    RegisterRequestDto longUsernameRequest = RegisterRequestDto.builder()
+            .username("lqqqqqqqqqqqqqqq")
+            .password("123456")
+            .email("lqqqqqqqqqqqqqqq@qq.com")
+            .build();
+    RegisterRequestDto invalidCharacterUsernameRequest = RegisterRequestDto.builder()
+            .username("@le#qi$")
+            .password("123456")
+            .email("leqi@qq.com")
+            .build();
+    RegisterRequestDto withoutPasswordRequest = RegisterRequestDto.builder()
+            .username("Tom")
+            .email("tom@qq.com")
+            .build();
+    RegisterRequestDto emptyPasswordRequest = RegisterRequestDto.builder()
+            .username("Tom")
+            .password("")
+            .email("tom@qq.com")
+            .build();
+    RegisterRequestDto shortPasswordRequest = RegisterRequestDto.builder()
+            .username("Tom")
+            .password("123")
+            .email("tom@qq.com")
+            .build();
+    RegisterRequestDto longPasswordRequest = RegisterRequestDto.builder()
+            .username("Tom")
+            .password("12345678910111213")
+            .email("tom@qq.com")
+            .build();
+    RegisterRequestDto invalidEmailRequestDto = RegisterRequestDto.builder()
+            .username("Tom")
+            .password("12345")
+            .email("tom@777@qq.com")
+            .build();
+
+
     @Autowired
     MockMvc mockMvc;
 
@@ -50,16 +104,10 @@ class RegisterControllerTest {
 
     @Test
     public void shouldRegisterSuccess() throws Exception {
-        RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
-                .username("Tom")
-                .password("123456")
-                .email("tom@qq.com")
-                .build();
-
         mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(registerRequestDto)))
+                .content(objectMapper.writeValueAsString(normalRequest)))
                 .andExpect(status().isCreated());
 
         assertEquals(1, RegisterService.userMap.size());
@@ -67,19 +115,13 @@ class RegisterControllerTest {
 
     @Test
     public void shouldRegisterFailedWhenUsernameDuplicated() throws Exception {
-        RegisterRequestDto tomRequest = RegisterRequestDto.builder()
-                .username("Tom")
-                .password("123456")
-                .email("tom@qq.com")
-                .build();
-
         mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(tomRequest)))
+                .content(objectMapper.writeValueAsString(normalRequest)))
                 .andExpect(status().isCreated());
 
-        RegisterRequestDto secondTomRequest = RegisterRequestDto.builder()
+        RegisterRequestDto sameUsernameRequest = RegisterRequestDto.builder()
                 .username("Tom")
                 .password("654321")
                 .email("tom2@qq.com")
@@ -88,7 +130,7 @@ class RegisterControllerTest {
         mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(secondTomRequest)))
+                .content(objectMapper.writeValueAsString(sameUsernameRequest)))
                 .andExpect(jsonPath("$.message", is("用户已存在")))
                 .andExpect(status().isBadRequest());
 
@@ -97,15 +139,10 @@ class RegisterControllerTest {
 
     @Test
     public void shouldRegisterFailedWhenUsernameIsNull() throws Exception {
-        RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
-                .password("123456")
-                .email("tom@qq.com")
-                .build();
-
         mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(registerRequestDto)))
+                .content(objectMapper.writeValueAsString(withoutUsernameRequest)))
                 .andExpect(jsonPath("$.message", is("用户名不能为空")))
                 .andExpect(status().isBadRequest());
 
@@ -114,12 +151,6 @@ class RegisterControllerTest {
 
     @Test
     public void shouldRegisterFailedWhenUsernameSizeInvalid() throws Exception {
-        RegisterRequestDto shortUsernameRequest = RegisterRequestDto.builder()
-                .username("lq")
-                .password("123456")
-                .email("lq@qq.com")
-                .build();
-
         mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -128,12 +159,6 @@ class RegisterControllerTest {
                 .andExpect(status().isBadRequest());
 
         assertEquals(0, RegisterService.userMap.size());
-
-        RegisterRequestDto longUsernameRequest = RegisterRequestDto.builder()
-                .username("lqqqqqqqqqqqqqqq")
-                .password("123456")
-                .email("lqqqqqqqqqqqqqqq@qq.com")
-                .build();
 
         mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
@@ -147,16 +172,10 @@ class RegisterControllerTest {
 
     @Test
     public void shouldRegisterFailedWhenUsernameContainsInvalidCharacters() throws Exception {
-        RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
-                .username("@le#qi$")
-                .password("123456")
-                .email("leqi@qq.com")
-                .build();
-
         mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(registerRequestDto)))
+                .content(objectMapper.writeValueAsString(invalidCharacterUsernameRequest)))
                 .andExpect(jsonPath("$.message", is("用户名只能由字母、数字或下划线组成")))
                 .andExpect(status().isBadRequest());
 
@@ -165,15 +184,10 @@ class RegisterControllerTest {
 
     @Test
     public void shouldRegisterFailedWhenPasswordIsNull() throws Exception {
-        RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
-                .username("Tom")
-                .email("tom@qq.com")
-                .build();
-
         mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(registerRequestDto)))
+                .content(objectMapper.writeValueAsString(withoutPasswordRequest)))
                 .andExpect(jsonPath("$.message", is("密码不能为空")))
                 .andExpect(status().isBadRequest());
 
@@ -181,13 +195,19 @@ class RegisterControllerTest {
     }
 
     @Test
-    public void shouldRegisterFailedWhenPasswordSizeInvalid() throws Exception {
-        RegisterRequestDto shortPasswordRequest = RegisterRequestDto.builder()
-                .username("Tom")
-                .password("123")
-                .email("tom@qq.com")
-                .build();
+    public void shouldRegisterFailedWhenPasswordIsEmpty() throws Exception {
+        mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(emptyPasswordRequest)))
+                .andExpect(jsonPath("$.message", is("密码长度应为5到12位")))
+                .andExpect(status().isBadRequest());
 
+        assertEquals(0, RegisterService.userMap.size());
+    }
+
+    @Test
+    public void shouldRegisterFailedWhenPasswordSizeInvalid() throws Exception {
         mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -196,12 +216,6 @@ class RegisterControllerTest {
                 .andExpect(status().isBadRequest());
 
         assertEquals(0, RegisterService.userMap.size());
-
-        RegisterRequestDto longPasswordRequest = RegisterRequestDto.builder()
-                .username("Tom")
-                .password("12345678910111213")
-                .email("tom@qq.com")
-                .build();
 
         mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
@@ -215,16 +229,10 @@ class RegisterControllerTest {
 
     @Test
     public void shouldRegisterFailedWhenEmailInvalid() throws Exception {
-        RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
-                .username("Tom")
-                .password("12345")
-                .email("tom@777@qq.com")
-                .build();
-
         mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(registerRequestDto)))
+                .content(objectMapper.writeValueAsString(invalidEmailRequestDto)))
                 .andExpect(jsonPath("$.message", is("邮箱地址不合法")))
                 .andExpect(status().isBadRequest());
 

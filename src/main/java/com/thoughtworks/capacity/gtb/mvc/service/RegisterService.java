@@ -28,14 +28,13 @@ public class RegisterService {
     }
 
     private boolean checkUsernameDuplicated(RegisterRequestDto registerRequestDto) {
-        boolean duplicated = false;
-        for (int id: userMap.keySet()) {
-            User user = userMap.get(id);
+        boolean isDuplicated = false;
+        for (User user: userMap.values()) {
             if (user.getUsername().equals(registerRequestDto.getUsername())) {
-                duplicated = true;
+                isDuplicated = true;
                 break;
             }
         }
-        return duplicated;
+        return isDuplicated;
     }
 }
