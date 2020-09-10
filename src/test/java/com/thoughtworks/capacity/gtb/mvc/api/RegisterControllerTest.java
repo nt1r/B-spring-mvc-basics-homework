@@ -2,7 +2,7 @@ package com.thoughtworks.capacity.gtb.mvc.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.capacity.gtb.mvc.dto.RegisterRequestDto;
-import com.thoughtworks.capacity.gtb.mvc.service.RegisterService;
+import com.thoughtworks.capacity.gtb.mvc.service.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -86,11 +86,11 @@ class RegisterControllerTest {
     MockMvc mockMvc;
 
     @Autowired
-    RegisterService registerService;
+    UserService userService;
 
     @BeforeEach
     void setUp() {
-        RegisterService.userMap.clear();
+        UserService.userMap.clear();
     }
 
     @AfterEach
@@ -110,7 +110,7 @@ class RegisterControllerTest {
                 .content(objectMapper.writeValueAsString(normalRequest)))
                 .andExpect(status().isCreated());
 
-        assertEquals(1, RegisterService.userMap.size());
+        assertEquals(1, UserService.userMap.size());
     }
 
     @Test
@@ -134,7 +134,7 @@ class RegisterControllerTest {
                 .andExpect(jsonPath("$.message", is("用户已存在")))
                 .andExpect(status().isBadRequest());
 
-        assertEquals(1, RegisterService.userMap.size());
+        assertEquals(1, UserService.userMap.size());
     }
 
     @Test
@@ -146,7 +146,7 @@ class RegisterControllerTest {
                 .andExpect(jsonPath("$.message", is("用户名不能为空")))
                 .andExpect(status().isBadRequest());
 
-        assertEquals(0, RegisterService.userMap.size());
+        assertEquals(0, UserService.userMap.size());
     }
 
     @Test
@@ -158,7 +158,7 @@ class RegisterControllerTest {
                 .andExpect(jsonPath("$.message", is("用户名长度应为3到10位")))
                 .andExpect(status().isBadRequest());
 
-        assertEquals(0, RegisterService.userMap.size());
+        assertEquals(0, UserService.userMap.size());
 
         mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
@@ -167,7 +167,7 @@ class RegisterControllerTest {
                 .andExpect(jsonPath("$.message", is("用户名长度应为3到10位")))
                 .andExpect(status().isBadRequest());
 
-        assertEquals(0, RegisterService.userMap.size());
+        assertEquals(0, UserService.userMap.size());
     }
 
     @Test
@@ -179,7 +179,7 @@ class RegisterControllerTest {
                 .andExpect(jsonPath("$.message", is("用户名只能由字母、数字或下划线组成")))
                 .andExpect(status().isBadRequest());
 
-        assertEquals(0, RegisterService.userMap.size());
+        assertEquals(0, UserService.userMap.size());
     }
 
     @Test
@@ -191,7 +191,7 @@ class RegisterControllerTest {
                 .andExpect(jsonPath("$.message", is("密码不能为空")))
                 .andExpect(status().isBadRequest());
 
-        assertEquals(0, RegisterService.userMap.size());
+        assertEquals(0, UserService.userMap.size());
     }
 
     @Test
@@ -203,7 +203,7 @@ class RegisterControllerTest {
                 .andExpect(jsonPath("$.message", is("密码长度应为5到12位")))
                 .andExpect(status().isBadRequest());
 
-        assertEquals(0, RegisterService.userMap.size());
+        assertEquals(0, UserService.userMap.size());
     }
 
     @Test
@@ -215,7 +215,7 @@ class RegisterControllerTest {
                 .andExpect(jsonPath("$.message", is("密码长度应为5到12位")))
                 .andExpect(status().isBadRequest());
 
-        assertEquals(0, RegisterService.userMap.size());
+        assertEquals(0, UserService.userMap.size());
 
         mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
@@ -224,7 +224,7 @@ class RegisterControllerTest {
                 .andExpect(jsonPath("$.message", is("密码长度应为5到12位")))
                 .andExpect(status().isBadRequest());
 
-        assertEquals(0, RegisterService.userMap.size());
+        assertEquals(0, UserService.userMap.size());
     }
 
     @Test
@@ -236,6 +236,6 @@ class RegisterControllerTest {
                 .andExpect(jsonPath("$.message", is("邮箱地址不合法")))
                 .andExpect(status().isBadRequest());
 
-        assertEquals(0, RegisterService.userMap.size());
+        assertEquals(0, UserService.userMap.size());
     }
 }

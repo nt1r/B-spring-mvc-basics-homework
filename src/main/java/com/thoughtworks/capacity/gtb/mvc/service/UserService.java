@@ -1,5 +1,6 @@
 package com.thoughtworks.capacity.gtb.mvc.service;
 
+import com.thoughtworks.capacity.gtb.mvc.dto.LoginResponseDto;
 import com.thoughtworks.capacity.gtb.mvc.dto.RegisterRequestDto;
 import com.thoughtworks.capacity.gtb.mvc.entity.User;
 import com.thoughtworks.capacity.gtb.mvc.exception.RegisterUsernameDuplicatedError;
@@ -7,14 +8,15 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
-public class RegisterService {
+public class UserService {
     private Integer autoIncreaseId = 0;
     public static final Map<Integer, User> userMap = new HashMap<>();
 
     public void register(RegisterRequestDto registerRequestDto) {
-        if (checkUsernameDuplicated(registerRequestDto)) {
+        if (isUsernameContained(registerRequestDto)) {
             throw new RegisterUsernameDuplicatedError("用户已存在");
         }
 
@@ -27,7 +29,7 @@ public class RegisterService {
         userMap.put(autoIncreaseId++, user);
     }
 
-    private boolean checkUsernameDuplicated(RegisterRequestDto registerRequestDto) {
+    private boolean isUsernameContained(RegisterRequestDto registerRequestDto) {
         boolean isDuplicated = false;
         for (User user: userMap.values()) {
             if (user.getUsername().equals(registerRequestDto.getUsername())) {
@@ -36,5 +38,22 @@ public class RegisterService {
             }
         }
         return isDuplicated;
+    }
+
+    public LoginResponseDto login(String username, String password) {
+        User user = findUserByUsername(username);
+        return LoginResponseDto.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .email(user.getEmail())
+                .build();
+    }
+
+    private User findUserByUsername(String username) {
+        Optional<User> userOptional = userMap.values().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
+        return userOptional.orElse(null);
     }
 }
