@@ -109,4 +109,12 @@ class LoginControllerTest {
                 .characterEncoding("UTF-8"))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    public void shouldLoginFailedWhenUsernameNotExist() throws Exception {
+        mockMvc.perform(get(String.format(loginUrl, "Tommy", "123456"))
+                .accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8"))
+                .andExpect(status().isBadRequest());
+    }
 }

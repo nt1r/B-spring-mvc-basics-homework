@@ -4,6 +4,7 @@ import com.thoughtworks.capacity.gtb.mvc.dto.LoginResponseDto;
 import com.thoughtworks.capacity.gtb.mvc.dto.RegisterRequestDto;
 import com.thoughtworks.capacity.gtb.mvc.entity.User;
 import com.thoughtworks.capacity.gtb.mvc.exception.RegisterUsernameDuplicatedError;
+import com.thoughtworks.capacity.gtb.mvc.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -42,6 +43,10 @@ public class UserService {
 
     public LoginResponseDto login(String username, String password) {
         User user = findUserByUsername(username);
+        if (user == null) {
+            throw new UserNotFoundException("用户不存在");
+        }
+
         return LoginResponseDto.builder()
                 .id(user.getId())
                 .username(user.getUsername())
