@@ -162,4 +162,72 @@ class RegisterControllerTest {
 
         assertEquals(0, RegisterService.userMap.size());
     }
+
+    @Test
+    public void shouldRegisterFailedWhenPasswordIsNull() throws Exception {
+        RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
+                .username("Tom")
+                .email("tom@qq.com")
+                .build();
+
+        mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequestDto)))
+                .andExpect(jsonPath("$.message", is("密码不能为空")))
+                .andExpect(status().isBadRequest());
+
+        assertEquals(0, RegisterService.userMap.size());
+    }
+
+    @Test
+    public void shouldRegisterFailedWhenPasswordSizeInvalid() throws Exception {
+        RegisterRequestDto shortPasswordRequest = RegisterRequestDto.builder()
+                .username("Tom")
+                .password("123")
+                .email("tom@qq.com")
+                .build();
+
+        mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(shortPasswordRequest)))
+                .andExpect(jsonPath("$.message", is("密码长度应为5到12位")))
+                .andExpect(status().isBadRequest());
+
+        assertEquals(0, RegisterService.userMap.size());
+
+        RegisterRequestDto longPasswordRequest = RegisterRequestDto.builder()
+                .username("Tom")
+                .password("12345678910111213")
+                .email("tom@qq.com")
+                .build();
+
+        mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(longPasswordRequest)))
+                .andExpect(jsonPath("$.message", is("密码长度应为5到12位")))
+                .andExpect(status().isBadRequest());
+
+        assertEquals(0, RegisterService.userMap.size());
+    }
+
+    @Test
+    public void shouldRegisterFailedWhenEmailInvalid() throws Exception {
+        RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
+                .username("Tom")
+                .password("12345")
+                .email("tom@777@qq.com")
+                .build();
+
+        mockMvc.perform(post(registerUrl).accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequestDto)))
+                .andExpect(jsonPath("$.message", is("邮箱地址不合法")))
+                .andExpect(status().isBadRequest());
+
+        assertEquals(0, RegisterService.userMap.size());
+    }
 }

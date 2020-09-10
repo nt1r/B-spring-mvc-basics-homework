@@ -20,10 +20,10 @@ public class RegisterRequestDto {
     @Pattern(regexp = "^[0-9a-zA-Z_]+$", message = "用户名只能由字母、数字或下划线组成")
     String username;
 
-    @NotNull
-    @Size(min = 5, max = 12)
+    @NotNull(message = "密码不能为空")
+    @Size(min = 5, max = 12, message = "密码长度应为5到12位")
     String password;
 
-    @Email
+    @Email(message = "邮箱地址不合法")
     String email;
 }
